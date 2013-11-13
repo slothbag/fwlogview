@@ -1,0 +1,6 @@
+<?
+$dbsettings['host'] = "127.0.0.1";
+$dbsettings['dbname'] = "";
+$dbsettings['user'] = "";
+$dbsettings['password'] = "";
+?>
