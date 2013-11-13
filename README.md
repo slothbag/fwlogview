@@ -1,8 +1,6 @@
 fwlogview
 =========
 
-A php based iptable log viewer
-
 A complete firewall inspection utility.
 
 This project aims to be a simple and fast / low resource way to view firewall relevant information. Primarily the three area's I have found important are IPTable logging for past intrusion attempts, Conntrack to view current connections and the ARP table to view physically connected devices. There are not many firewall log viewers that have been updated/maintained in the past 5 years and I wanted something that was compatible with the latest ulog2 process.
