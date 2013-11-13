@@ -11,6 +11,8 @@ Feel free to log issues and submit pull requests on the fwlogview github page.
 
 If you like this software or find it useful please consider donating to my bitcoin address below.
 
+Bitcoin: 14zYqNfs6ubktnLkqCCmQdYA8qmGMXA9L5
+
 If you are interested in paid support or sponsored development for this software, contact me via my email listed on github.
 
 Install
