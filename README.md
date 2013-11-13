@@ -19,6 +19,8 @@ Install
 =======
 Install ulog2 and create the database tables using the ulog2 provided scripts.  Make sure iptables is writing logs into the table.
 
+Copy the repository into your Web root or into a subfolder.
+
 Copy the config.php.sample to config.php and fill in your DB settings.
 
 You should be good to go.
