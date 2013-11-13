@@ -27,4 +27,4 @@ WARNINGS
 =========
 This is still very much Alpha quality software, do now allow public access to this website.
 
-[Screenshot](wiki/Home)
+[Screenshot](https://github.com/slothbag/fwlogview/wiki)
