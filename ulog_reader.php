@@ -155,7 +155,7 @@ class ulogReader {
                 on ulog2._id = udp._udp_id
 				left outer join ip_proto
                 on ulog2.ip_protocol = ip_proto._proto_id
-			    group by ip_saddr order by 3 desc limit 10";
+			    group by 2 order by 3 desc limit 10";
 
     $rs = mysql_query($query);
     

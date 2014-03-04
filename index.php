@@ -117,34 +117,48 @@ if ($filter == 'All') $filter = '';
 		//CONNTRACK
 	    exec("/usr/sbin/conntrack -L", $output, $result);
 		echo '<table class="table table-condensed">';
-		echo '<thead><th>Proto</th><th>TTL</th><th>State</th><th>Src</th><th>Dst</th><th>Src Port</th><th>Dst Port</th><th>Src</th><th>Dst</th><th>Src Port</th><th>Dst Port</th></thead>';
+		echo '<thead><th>Proto</th><th>TTL</th><th>State</th><th>Src IP</th><th>Dst IP</th><th>Src Port</th><th>Dst Port</th>';
+		//<th>Src</th><th>Dst</th><th>Src Port</th><th>Dst Port</th></thead>';
 		foreach ($output as $line) {
 		    $fields = preg_split('/ /', $line, -1, PREG_SPLIT_NO_EMPTY);
+			if ($fields[0] == 'tcp')
+				$src_col = 4;
+			else
+				$src_col = 3;
+			
+			//check if src and dst are both on the LAN then skip it
+			if (substr(keyvalue($fields[$src_col])[1],0,strlen($lan_filter)) == $lan_filter && substr(keyvalue($fields[$src_col+1])[1],0,strlen($lan_filter)) == $lan_filter)
+				continue;
+				
+			//ignore upnp and bonjour multicast connections
+			if (substr(keyvalue($fields[$src_col+1])[1],0,15) == '239.255.255.250' || substr(keyvalue($fields[$src_col+1])[1],0,11) == '224.0.0.251')
+				continue;
+				
+			//ignore localhost connections
+			if (substr(keyvalue($fields[$src_col])[1],0,9) == '127.0.0.1')
+				continue;
+			
 			echo '<tr>';
 			echo '<td>'.$fields[0].'</td>';
-			if ($fields[0] == 'tcp') {
-				echo '<td>'.$fields[2].'</td>';
-				echo '<td>'.$fields[3].'</td>';
-				echo '<td>'.keyvalue_value($fields[4]).'</td>';
-				echo '<td>'.keyvalue_value($fields[5]).'</td>';
-				echo '<td>'.keyvalue_value($fields[6]).'</td>';
-				echo '<td>'.keyvalue_value($fields[7]).'</td>';
-				echo '<td>'.keyvalue_value($fields[8]).'</td>';
-				echo '<td>'.keyvalue_value($fields[9]).'</td>';
-				echo '<td>'.keyvalue_value($fields[10]).'</td>';
-				echo '<td>'.keyvalue_value($fields[11]).'</td>';
-			}
-			else {
-				echo '<td>'.$fields[2].'</td>';
-				echo '<td></td>';
-				echo '<td>'.keyvalue_value($fields[3]).'</td>';
-				echo '<td>'.keyvalue_value($fields[4]).'</td>';
-				echo '<td>'.keyvalue_value($fields[5]).'</td>';
-				echo '<td>'.keyvalue_value($fields[6]).'</td>';
-				echo '<td>'.keyvalue_value($fields[7]).'</td>';
-				echo '<td>'.keyvalue_value($fields[8]).'</td>';
-				echo '<td>'.keyvalue_value($fields[9]).'</td>';
-				echo '<td>'.keyvalue_value($fields[10]).'</td>';			
+			for ($a=2;$a<count($fields);$a++) {
+				//if its udp make state blank
+				if ($fields[0] == 'udp' && $a == 3)
+					echo '<td></td>';
+				
+				//Ignore these columns (not needed if dport break is used below)
+				if (keyvalue($fields[$a])[0] == 'packets' || keyvalue($fields[$a])[0] == 'bytes' || $fields[$a] == '[UNREPLIED]' || $fields[$a] == '[ASSURED]'
+					|| keyvalue($fields[$a])[0] == 'mark' || keyvalue($fields[$a])[0] == 'use')
+					continue;
+				
+				//print out the field
+				if (strpos($fields[$a],'=') > 0)
+					echo '<td>'.keyvalue($fields[$a])[1].'</td>';
+				else
+					echo '<td>'.$fields[$a].'</td>';
+					
+				//if field was dport then finish field loop
+				if (keyvalue($fields[$a])[0] == 'dport')
+					break;
 			}
 			echo '</tr>';
 		}
@@ -223,11 +237,10 @@ if ($filter == 'All') $filter = '';
 </html>
 
 <?
-function keyvalue_value($keyvalue) {
+function keyvalue($keyvalue) {
 	$split = explode('=', $keyvalue);
 	if (count($split) == 1)
-		return $keyvalue;
-	else
-		return $split[1];
+		$split[] = '';
+	return $split;
 }
 ?>
